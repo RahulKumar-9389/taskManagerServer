@@ -2,12 +2,12 @@
   "name": "server",
   "version": "1.0.0",
   "description": "A Task Management App where user can manage their task",
-  "main": "index.js",
+  "main": "dist/index",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "concurrently \"tsc -w\" \" nodemon dist/index.js\""
+    "start": "node dist/index",
+    "dev": "concurrently \"tsc -w\" \" nodemon dist/index\""
   },
   "keywords": [
     "Node",
