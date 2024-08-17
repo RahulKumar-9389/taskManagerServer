@@ -1,0 +1,46 @@
+import mongoose from "mongoose";
+import JWT from 'jsonwebtoken';
+import bcryt from 'bcryptjs';
+;
+const userSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: [true, 'Username is required'],
+        trim: true
+    },
+    email: {
+        type: String,
+        required: [true, 'Email is required'],
+        unique: true
+    },
+    password: {
+        type: String,
+        required: [true, 'Password is required']
+    }
+}, { timestamps: true });
+// Hash user password
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        next();
+    }
+    const salt_rounds = await bcryt.genSalt(10);
+    const hashed_password = await bcryt.hash(this.password, salt_rounds);
+    this.password = hashed_password;
+});
+// compare password 
+userSchema.methods.comparePassword = async function (password) {
+    return await bcryt.compare(password, this.password);
+};
+// Generate Token
+userSchema.methods.generateToken = async function () {
+    try {
+        return JWT.sign({
+            id: this._id,
+            email: this.email,
+        }, process.env.JWT_SECRET, { expiresIn: '2d' });
+    }
+    catch (error) {
+        console.log(`Generate Token Failed : ${error}`);
+    }
+};
+export default mongoose.model('User', userSchema);
